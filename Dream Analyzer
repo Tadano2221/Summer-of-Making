@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Dream Analyzer 🌙</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            background-image: url('https://finlandnaturally.com/wp-content/uploads/2017/11/aurora-3.jpg');
+            /* Aurora image */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            color: #fff;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+        
+        header {
+            text-align: center;
+            padding: 2rem 1rem 1rem;
+            background: rgba(10, 10, 20, 0.6);
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: #e0c3fc;
+        }
+        
+        header p {
+            color: #ccc;
+        }
+        
+        main {
+            max-width: 800px;
+            margin: 3rem auto 5rem;
+            background: rgba(20, 20, 40, 0.75);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+            position: relative;
+            z-index: 1;
+        }
+        
+        textarea,
+        select,
+        input[type="text"],
+        button {
+            width: 100%;
+            margin-top: 1rem;
+            padding: 0.9rem;
+            font-size: 1rem;
+            border-radius: 10px;
+            border: none;
+            box-sizing: border-box;
+        }
+        
+        textarea {
+            height: 140px;
+            resize: vertical;
+        }
+        
+        button {
+            background: #7f5af0;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 1.5rem;
+        }
+        
+        button:hover {
+            background: #5a3fc0;
+        }
+        
+        .label {
+            font-weight: bold;
+            margin-top: 1.2rem;
+            display: block;
+            color: #f5e3ff;
+        }
+        
+        .output {
+            margin-top: 2rem;
+            background: #1e2035;
+            padding: 1.5rem;
+            border-radius: 16px;
+        }
+        
+        .tag {
+            display: inline-block;
+            background: #3e4260;
+            padding: 0.4rem 0.8rem;
+            margin: 0.2rem;
+            border-radius: 20px;
+        }
+        
+        strong {
+            color: #ffddff;
+        }
+        
+        em {
+            color: #ccc;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(10, 10, 20, 0.7);
+            color: #ccc;
+            position: relative;
+            z-index: 1;
+        }
+        
+        #visualEffectContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .firefly {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: yellow;
+            border-radius: 50%;
+            box-shadow: 0 0 10px yellow;
+            animation: floatFirefly ease-in-out infinite;
+        }
+        
+        @keyframes floatFirefly {
+            0% {
+                transform: translate(0, 0);
+                opacity: 0.8;
+            }
+            50% {
+                transform: translate(20px, -30px);
+                opacity: 0.2;
+            }
+            100% {
+                transform: translate(-20px, 30px);
+                opacity: 0.8;
+            }
+        }
+        
+        .raindrop {
+            position: absolute;
+            top: -10px;
+            width: 2px;
+            height: 15px;
+            background: #61dafb;
+            animation: fall linear infinite;
+            opacity: 0.6;
+        }
+        
+        @keyframes fall {
+            to {
+                transform: translateY(110vh);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="overlay"></div>
+
+    <header>
+        <h1>🌙 Dream Analyzer</h1>
+        <p>Explore your subconscious with AI + reflection</p>
+    </header>
+
+    <main>
+        <label class="label">Describe your dream:</label>
+        <textarea id="dreamInput" placeholder="I was flying over a forest..."></textarea>
+
+        <label class="label">How did it make you feel?</label>
+        <select id="emotion">
+      <option value="calm">Calm</option>
+      <option value="anxious">Anxious</option>
+      <option value="joyful">Joyful</option>
+      <option value="confused">Confused</option>
+      <option value="fearful">Fearful</option>
+      <option value="empowered">Empowered</option>
+    </select>
+
+        <label class="label">What might this dream be telling you?</label>
+        <input type="text" id="reflection" placeholder="Maybe I want more freedom..." />
+
+        <button onclick="analyzeDream()">🔮 Analyze Dream</button>
+
+        <div class="output" id="results" style="display:none;">
+            <h3>🔍 Dream Analysis</h3>
+            <p id="keywords"></p>
+            <p id="interpretation"></p>
+            <p id="emotionTag"></p>
+            <p id="userReflection"></p>
+            <p id="personality"></p>
+            <p id="suggestedAction"></p>
+            <p id="hiddenDesire"></p>
+            <p id="message"></p>
+            <p id="theme"></p>
+            <p id="sleepTip"></p>
+            <p id="recurring"></p>
+            <p id="archetype"></p>
+        </div>
+    </main>
+
+    <footer>
+        <label for="effectSelect"><strong>🌌 Visual Mode:</strong></label>
+        <select id="effectSelect" onchange="setEffect(this.value)">
+      <option value="none">None</option>
+      <option value="firefly">Firefly</option>
+      <option value="rain">Rain</option>
+    </select>
+    </footer>
+
+    <div id="visualEffectContainer"></div>
+
+    <script>
+        function analyzeDream() {
+            const dreamText = document.getElementById("dreamInput").value.toLowerCase();
+            const emotion = document.getElementById("emotion").value;
+            const reflection = document.getElementById("reflection").value;
+            const results = document.getElementById("results");
+
+            const keywordList = ["flying", "teeth", "falling", "water", "forest", "chased", "door"];
+            const symbols = keywordList.filter(k => dreamText.includes(k));
+
+            let interpretation = "Your dream may reflect inner thoughts or transitions.";
+            let message = "You are being called to pay attention to your inner world.";
+            let theme = "Transformation";
+            let archetype = "The Seeker";
+            let archetypeExplanation = "The Seeker longs for truth, exploration, and deeper understanding, often venturing into the unknown.";
+            let recurring = "This might be a signal to journal and track emotional triggers.";
+            let sleepTip = "Try sleeping in total darkness and record dreams right after waking.";
+
+            if (symbols.includes("flying")) {
+                interpretation += " ✧Flying✧ shows a desire for freedom or ambition.";
+                message = "You want to rise above something in your life.";
+                theme = "Freedom";
+                archetype = "The Hero";
+                archetypeExplanation = "The Hero is courageous and driven, striving to overcome challenges and become stronger through trials.";
+            }
+            if (symbols.includes("teeth")) {
+                interpretation += " ✧Teeth✧ may reflect anxiety or loss of control.";
+                message = "You may be self-conscious or fearing change.";
+                theme = "Vulnerability";
+                archetype = "The Innocent";
+                archetypeExplanation = "The Innocent seeks safety and happiness, often representing purity, hope, and the desire to do good.";
+            }
+            if (symbols.includes("falling")) {
+                interpretation += " ✧Falling✧ can symbolize fear of instability.";
+                message = "You feel unsupported or overwhelmed.";
+                theme = "Insecurity";
+                archetype = "The Orphan";
+                archetypeExplanation = "The Orphan feels abandoned or disconnected and seeks belonging, empathy, and restoration of trust.";
+            }
+            if (symbols.includes("forest")) {
+                interpretation += " ✧Forest✧ might mean confusion or a journey inward.";
+                message = "You are walking through unknown parts of your mind.";
+                theme = "Self-discovery";
+                archetype = "The Explorer";
+                archetypeExplanation = "The Explorer is drawn to new experiences and self-discovery, valuing freedom and authenticity.";
+            }
+            if (symbols.includes("water")) {
+                interpretation += " ✧Water✧ is often tied to emotions or subconscious flow.";
+                message = "Let your feelings flow instead of resisting them.";
+                theme = "Emotion";
+                archetype = "The Sage";
+                archetypeExplanation = "The Sage seeks truth and wisdom through knowledge and introspection, acting as a guide or mentor.";
+            }
+            if (symbols.includes("chased")) {
+                interpretation += " ✧Being chased✧ suggests avoidance or inner conflict.";
+                message = "You are avoiding something you should face.";
+                theme = "Confrontation";
+                archetype = "The Warrior";
+                archetypeExplanation = "The Warrior is determined and resilient, fighting for what they believe in and standing their ground.";
+            }
+            if (symbols.includes("door")) {
+                interpretation += " ✧Doors✧ can mean transition, opportunity, or closure.";
+                message = "You are at a threshold — something is beginning or ending.";
+                theme = "Change";
+                archetype = "The Magician";
+                archetypeExplanation = "The Magician transforms reality using insight, creativity, and vision — often representing personal change.";
+            }
+
+            const personalityMap = {
+                calm: "You're introspective and grounded.",
+                anxious: "You might be carrying hidden tension.",
+                joyful: "You radiate light even in sleep.",
+                confused: "You're navigating new paths in life.",
+                fearful: "You may be protecting something vulnerable.",
+                empowered: "You're ready to transform your world."
+            };
+
+            const suggestionMap = {
+                calm: "Practice gratitude journaling.",
+                anxious: "Try light stretching or soft music before bed.",
+                joyful: "Capture this joy in creative work.",
+                confused: "Reflect on your values and goals.",
+                fearful: "Confront a small fear tomorrow.",
+                empowered: "Start a bold new habit today."
+            };
+
+            const hiddenDesireMap = {
+                calm: "To stay balanced while growing.",
+                anxious: "To feel truly safe and certain.",
+                joyful: "To spread happiness more intentionally.",
+                confused: "To find clear purpose and belonging.",
+                fearful: "To be seen and supported.",
+                empowered: "To make a deep impact."
+            };
+
+            document.getElementById("keywords").innerHTML = "<strong>Symbols:</strong> " + symbols.map(s => `<span class='tag'>${s}</span>`).join(" ");
+            document.getElementById("interpretation").innerHTML = "<strong>AI Interpretation:</strong> " + interpretation;
+            document.getElementById("emotionTag").innerHTML = `<strong>Emotion:</strong> <span class='tag'>${emotion}</span>`;
+            document.getElementById("userReflection").innerHTML = "<strong>Your Reflection:</strong> " + reflection;
+            document.getElementById("personality").innerHTML = "<strong>Personality Insight:</strong> " + personalityMap[emotion];
+            document.getElementById("suggestedAction").innerHTML = "<strong>Suggested Action:</strong> " + suggestionMap[emotion];
+            document.getElementById("hiddenDesire").innerHTML = "<strong>Hidden Desire:</strong> " + hiddenDesireMap[emotion];
+            document.getElementById("message").innerHTML = "<strong>Subconscious Message:</strong> " + message;
+            document.getElementById("theme").innerHTML = "<strong>Dream Theme Category:</strong> " + theme;
+            document.getElementById("sleepTip").innerHTML = "<strong>Sleep Suggestion:</strong> " + sleepTip;
+            document.getElementById("recurring").innerHTML = "<strong>Recurring Dream Signal:</strong> " + recurring;
+            document.getElementById("archetype").innerHTML =
+                "<strong>Archetype Reference:</strong> " + archetype +
+                "<br/><em>" + archetypeExplanation + "</em>";
+
+            results.style.display = "block";
+        }
+
+        function setEffect(mode) {
+            const container = document.getElementById('visualEffectContainer');
+            container.innerHTML = '';
+            if (mode === 'firefly') {
+                const num = 30;
+                for (let i = 0; i < num; i++) {
+                    const f = document.createElement('div');
+                    f.classList.add('firefly');
+                    f.style.top = Math.random() * 100 + 'vh';
+                    f.style.left = Math.random() * 100 + 'vw';
+                    f.style.animationDuration = 5 + Math.random() * 5 + 's';
+                    container.appendChild(f);
+                }
+            } else if (mode === 'rain') {
+                const num = 100;
+                for (let i = 0; i < num; i++) {
+                    const r = document.createElement('div');
+                    r.classList.add('raindrop');
+                    r.style.left = Math.random() * 100 + 'vw';
+                    r.style.animationDelay = Math.random() * 5 + 's';
+                    r.style.animationDuration = 0.5 + Math.random() + 's';
+                    container.appendChild(r);
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
